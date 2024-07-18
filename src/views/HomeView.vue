@@ -17,12 +17,28 @@
 </template>
 
 <script>
-
-
 export default {
   name: 'HomeView',
-  components: {
-    
-  }
-}
+};
 </script>
+
+<style scoped>
+.home-view {
+  background-image: url('@/assets/naslovna.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.content {
+  background-color: rgba(0, 0, 0, 0.5); 
+  padding: 20px;
+  border-radius: 10px;
+}
+</style>
