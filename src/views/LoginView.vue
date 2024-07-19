@@ -19,10 +19,8 @@
 </template>
 
 <script>
-import { auth } from '@/firebase';
-
 export default {
-  name: "login-view",
+  name: "LoginView",
   data() {
     return {
       email: "",
@@ -31,15 +29,12 @@ export default {
   },
   methods: {
     login() {
-      auth.signInWithEmailAndPassword(this.email, this.password)
-        .then(userCredential => {
-          
-          console.log(userCredential);
-          this.$router.push('/search-view');
-        })
-        .catch(error => {
-          console.error(error);
-        });
+     
+      console.log('User email:', this.email);
+      console.log('User password:', this.password);
+      
+     
+      this.$router.push('/search-view');
     }
   }
 }
@@ -74,4 +69,3 @@ export default {
   width: 100%;
 }
 </style>
-

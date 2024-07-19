@@ -1,62 +1,52 @@
 <template>
-    <div class="registration-view">
+    <div class="signup-view">
       <div class="content">
         <h2>Registracija</h2>
-        <form @submit.prevent="signup">
+        <form @submit.prevent="signUp">
+          <div class="form-group">
+            <label for="nameField">Upiši ime</label>
+            <input v-model="name" type="text" class="form-control" id="nameField" placeholder="Enter your name">
+          </div>
           <div class="form-group">
             <label for="emailField">Upiši e-mail</label>
-            <input v-model="email" type="email" class="form-control" id="emailField" aria-describedby="emailHelp" placeholder="Enter email">
-            <small id="emailHelp" class="form-text text-muted"></small>
+            <input v-model="email" type="email" class="form-control" id="emailField" placeholder="Enter email">
           </div>
           <div class="form-group">
             <label for="passwordField">Upiši lozinku</label>
             <input v-model="password" type="password" class="form-control" id="passwordField" placeholder="Password">
           </div>
-          <div class="form-group">
-            <label for="confirmPasswordField">Ponovi lozinku</label>
-            <input v-model="passwordRepeat" type="password" class="form-control" id="confirmPasswordField" placeholder="Confirm password">
-          </div>
-          <button type="submit" class="btn btn-primary mt-5">Registriraj se</button>
+          <button type="submit" class="btn btn-primary mt-5">Registruj se</button>
         </form>
       </div>
     </div>
   </template>
   
   <script>
-  import { auth } from '@/firebase';
-  
   export default {
-    name: "registration-view",
+    name: "SignUpView",
     data() {
       return {
+        name: "",
         email: "",
         password: "",
-        passwordRepeat: ""
       };
     },
     methods: {
-      signup() {
-        if (this.password !== this.passwordRepeat) {
-          alert("Lozinke se ne podudaraju.");
-          return;
-        }
-  
-        auth.createUserWithEmailAndPassword(this.email, this.password)
-          .then(userCredential => {
-           
-            console.log(userCredential);
-            this.$router.push('/lgin-view');
-          })
-          .catch(error => {
-            console.error(error);
-          });
+      signUp() {
+      
+        console.log('User name:', this.name);
+        console.log('User email:', this.email);
+        console.log('User password:', this.password);
+        
+       
+        this.$router.push('/login-view');
       }
     }
   }
   </script>
   
   <style scoped>
-  .registration-view {
+  .signup-view {
     background-image: url('@/assets/naslovna.jpg');
     background-size: cover;
     background-position: center;
