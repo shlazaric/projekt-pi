@@ -10,6 +10,13 @@
     <div v-if="selectedBook" class="book-item">
       <img :src="getImagePath(selectedBook.image)" :alt="selectedBook.name">
       <p>{{ selectedBook.name }}</p>
+      
+      
+      <div class="like-button" @click="toggleLike">
+        <span v-if="isLiked">❤️</span>
+        <span v-else>🤍</span>
+      </div>
+      
      
       <div class="review-section">
         <h3>Napiši recenziju:</h3>
@@ -30,11 +37,11 @@ export default {
     return {
       searchQuery: '',
       books: [
-        { id: 1, name: 'Nestrpljiva čizmica', image: 'cizmica.jpg' },
-        { id: 2, name: 'Gregorov dnevnik', image: 'dnevnik.jpg' },
-        { id: 3, name: 'Empatija slušanje srcem', image: 'empatija.jpg' },
-        { id: 4, name: 'Mali princ', image: 'princ.jpg' },
-        { id: 5, name: 'Zaljubljen do ušiju', image: 'zaljubljen.jpg' },
+        { id: 1, name: 'Nestrpljiva čizmica', image: 'cizmica.jpg', liked: false },
+        { id: 2, name: 'Gregorov dnevnik', image: 'dnevnik.jpg', liked: false },
+        { id: 3, name: 'Empatija slušanje srcem', image: 'empatija.jpg', liked: false },
+        { id: 4, name: 'Mali princ', image: 'princ.jpg', liked: false },
+        { id: 5, name: 'Zaljubljen do ušiju', image: 'zaljubljen.jpg', liked: false },
       ],
       selectedBook: null,
       showNotFoundMessage: false,
@@ -54,10 +61,20 @@ export default {
     submitReview() {
       if (this.reviewText.trim()) {
         alert(`Recenzija za knjigu "${this.selectedBook.name}":\n\n${this.reviewText}`);
-        this.reviewText = '';
+        this.reviewText = ''; 
       } else {
         alert('Molimo unesite tekst recenzije.');
       }
+    },
+    toggleLike() {
+      if (this.selectedBook) {
+        this.selectedBook.liked = !this.selectedBook.liked;
+      }
+    }
+  },
+  computed: {
+    isLiked() {
+      return this.selectedBook && this.selectedBook.liked;
     }
   }
 };
@@ -99,6 +116,12 @@ button {
 .book-item img {
   width: 100px;
   height: 100px;
+}
+
+.like-button {
+  cursor: pointer;
+  font-size: 2rem;
+  margin-top: 10px;
 }
 
 .review-section {
