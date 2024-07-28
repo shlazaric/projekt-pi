@@ -30,7 +30,24 @@
           { id: 2, name: 'Gregorov dnevnik', image: 'dnevnik.jpg' },
           { id: 3, name: 'Empatija slušanje srcem', image: 'empatija.jpg' },
           { id: 4, name: 'Mali princ', image: 'princ.jpg' },
-          { id: 5, name: 'Zaljubljen do ušiju', image: 'zaljubljen.jpg' }
+          { id: 5, name: 'Zaljubljen do ušiju', image: 'zaljubljen.jpg' },
+          { id: 6, name: 'Besmrtnost', image: 'besmrtnost.jpg'},
+          { id: 7, name: 'Igre nasljedstva', image: 'igre.jpg'},
+          { id: 8, name: 'Bog podzemlja', image: 'podzemlje.jpg'},
+          { id: 9, name: 'Bonton za djecu i mlade', image: 'bonton.jpg'},
+          { id: 10, name: 'u potrazi za Alaskom', image: 'alaska.jpg'},
+          { id: 11, name: 'Bajkarenje', image: 'bajkarenje.jpg'},
+          { id: 12, name: 'Harry Potter i kamen mudraca', image: 'harry.jpg'},
+          { id: 13, name: 'Kako bolje misliti', image:'kako.jpg' },
+          { id: 14, name: 'Kako manje misliti', image : 'kakomanje.jpg'},
+          {id: 15, name: 'Kako izbjeći manipulatore', image: 'manipulatori.jpg'},
+          {id: 16, name: 'Knjižnica tajni', image: 'knjiznica.jpg'},
+          {id: 17, name: 'Priča bez kraja', image: 'prica.jpg'},
+          {id: 18, name: 'Slučajni cimeri', image: 'cimeeri.jpg'},
+          {id: 19, name: 'Priča o plavom planetu', image: 'plaviplanet.jpg'},
+          {id: 20, name: 'Soba puna snova', image: 'soba.jpg'}
+
+
         ],
         selectedBook: null
       };
@@ -41,7 +58,7 @@
       },
       handleReviewSubmission(reviewData) {
         console.log(`Recenzija dodana za knjigu s ID-om ${reviewData.bookId}: ${reviewData.text}`);
-        // Ovdje možete obraditi i pohraniti recenziju (npr. dodati je u listu recenzija)
+     
       }
     }
   };
