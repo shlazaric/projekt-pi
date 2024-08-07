@@ -1,8 +1,10 @@
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/firestore';
+// firebase.js
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
-var firebaseConfig = {
+// Vaša Firebase konfiguracija
+const firebaseConfig = {
     apiKey: "AIzaSyBGki5dQLJvSTmCPgXrTUAlgOpIlhp2XUo",
     authDomain: "book-lovers-7b0ff.firebaseapp.com",
     projectId: "book-lovers-7b0ff",
@@ -12,7 +14,11 @@ var firebaseConfig = {
     measurementId: "G-ZC1KG54PGV"
 };
 
-const firebaseApp = firebase.initializeApp(firebaseConfig);
-export const auth = firebase.auth();
-export const db = firebase.firestore();
-export default firebaseApp;
+
+const app = initializeApp(firebaseConfig);
+
+
+const auth = getAuth(app);
+const firestore = getFirestore(app);
+
+export { auth, firestore };
