@@ -4,7 +4,7 @@ Naziv aplikacije i sastav vašeg tima: BookLovers, Shana Antonia lazarić
 
 Fakultet informatike u Puli : https://fipu.unipu.hr/
 
-Kolegij: Programsko inženjerstvo : ntankovic.unipu.hr/pi](https://fiputreca.notion.site/Programsko-in-enjerstvo-e353945331df468e8382cdad1e91c4b8
+Kolegij: Programsko inženjerstvo : https://fiputreca.notion.site/Programsko-in-enjerstvo-e353945331df468e8382cdad1e91c4b8
 
 Mentor: doc. dr. sc. Nikola Tanković : https://fiputreca.notion.site/Kontakt-stranica-875574d1b92248b1a8e90dae52cd29a9
 
