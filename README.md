@@ -4,9 +4,9 @@ Naziv aplikacije i sastav vašeg tima: BookLovers, Shana Antonia lazarić
 
 Fakultet informatike u Puli : https://fipu.unipu.hr/
 
-Kolegij: Programsko inženjerstvo : ntankovic.unipu.hr/pi
+Kolegij: Programsko inženjerstvo : ntankovic.unipu.hr/pi](https://fiputreca.notion.site/Programsko-in-enjerstvo-e353945331df468e8382cdad1e91c4b8
 
-Mentor: doc. dr. sc. Nikola Tanković : ntankovic.unipu.hr
+Mentor: doc. dr. sc. Nikola Tanković : https://fiputreca.notion.site/Kontakt-stranica-875574d1b92248b1a8e90dae52cd29a9
 
 Kratki opis funkcionalnosti: Aplikacija u koju se moguće ulogirati i postati njen korisnik te pretraživati knjige i za svaku napisati recenziju. Moguće je i označiti koja se knjiga korisniku sviđa te dodati na popis omiljenih. 
 
