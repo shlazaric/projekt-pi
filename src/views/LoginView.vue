@@ -5,12 +5,12 @@
       <form @submit.prevent="login">
         <div class="form-group">
           <label for="emailField">E-mail:</label>
-          <input v-model="email" type="email" class="form-control" id="emailField" aria-describedby="emailHelp" placeholder="Upiši e-mail">
+          <input v-model="email" type="email" class="form-control" id="emailField" aria-describedby="emailHelp" placeholder="Upiši e-mail" required>
           <small id="emailHelp" class="form-text text-muted"></small>
         </div>
         <div class="form-group">
           <label for="passwordField">Lozinka:</label>
-          <input v-model="password" type="password" class="form-control" id="passwordField" placeholder="Upiši lozinku">
+          <input v-model="password" type="password" class="form-control" id="passwordField" placeholder="Upiši lozinku" required>
         </div>
         <button type="submit" class="btn btn-primary mt-5">Prijavi se</button>
       </form>
@@ -19,6 +19,10 @@
 </template>
 
 <script>
+// Import Firebase auth
+import { auth } from '@/firebase'; // Koristite pravi put do firebase.js
+import { signInWithEmailAndPassword } from 'firebase/auth';
+
 export default {
   name: "LoginView",
   data() {
@@ -28,13 +32,18 @@ export default {
     };
   },
   methods: {
-    login() {
-     
-      console.log('User email:', this.email);
-      console.log('User password:', this.password);
-      
-     
-      this.$router.push('/search-view');
+    async login() {
+      try {
+        // Pokušaj prijave korisnika putem Firebase-a
+        const userCredential = await signInWithEmailAndPassword(auth, this.email, this.password);
+        console.log('User logged in:', userCredential.user);
+
+        // Preusmjeravanje na stranicu za pretragu nakon uspješne prijave
+        this.$router.push('/search-view');
+      } catch (error) {
+        console.error('Error during login:', error);
+        alert("Pogrešan e-mail ili lozinka!");
+      }
     }
   }
 }
