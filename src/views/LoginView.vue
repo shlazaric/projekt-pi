@@ -19,8 +19,8 @@
 </template>
 
 <script>
-// Import Firebase auth
-import { auth } from '@/firebase'; // Koristite pravi put do firebase.js
+
+import { auth } from '@/firebase'; 
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
 export default {
@@ -34,11 +34,11 @@ export default {
   methods: {
     async login() {
       try {
-        // Pokušaj prijave korisnika putem Firebase-a
+        
         const userCredential = await signInWithEmailAndPassword(auth, this.email, this.password);
         console.log('User logged in:', userCredential.user);
 
-        // Preusmjeravanje na stranicu za pretragu nakon uspješne prijave
+        
         this.$router.push('/search-view');
       } catch (error) {
         console.error('Error during login:', error);

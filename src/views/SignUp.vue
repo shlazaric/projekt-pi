@@ -26,7 +26,8 @@
 </template>
 
 <script>
-import firebase from '@/firebase';
+import { auth } from '@/firebase'; 
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 
 export default {
   name: "SignUpView",
@@ -46,14 +47,16 @@ export default {
       }
 
       try {
-        const userCredential = await firebase.auth().createUserWithEmailAndPassword(this.email, this.password);
+        // Registracija korisnika
+        const userCredential = await createUserWithEmailAndPassword(auth, this.email, this.password);
         console.log('Korisnik uspješno registriran:', userCredential.user);
 
-        
-        await userCredential.user.updateProfile({
+        // Ažuriranje profila korisnika
+        await updateProfile(userCredential.user, {
           displayName: this.name
         });
 
+        // Preusmjeravanje nakon uspješne registracije
         this.$router.push('/login-view');
       } catch (error) {
         console.error('Problem prilikom registracije:', error);
@@ -90,7 +93,12 @@ export default {
   margin-bottom: 15px;
 }
 
+input.form-control {
+  color: black; 
+}
+
 .btn-primary {
   width: 100%;
 }
 </style>
+

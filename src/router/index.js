@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
+import FavoritesView from '../views/FavoritesView.vue';
 
 
 const routes = [
@@ -28,6 +29,11 @@ const routes = [
     path: '/search-view',
     name: 'search-view',
     component: () => import(/* webpackChunkName: "searchview" */ '../views/SearchView.vue')
+  },
+  {
+    path: '/favorites',
+    name: 'Favorites',
+    component: FavoritesView,
   },
 ]
 
