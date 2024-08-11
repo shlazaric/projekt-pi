@@ -1,6 +1,6 @@
 <template>
   <div class="favorites">
-    <router-link to="/search" class="back-link">Povratak na pretraživanje</router-link>
+    <router-link to="/search-view" class="back-link">Povratak na pretraživanje</router-link>
     <h2>Omiljene knjige</h2>
     <div v-if="favoriteBooks.length">
       <div v-for="book in favoriteBooks" :key="book.id" class="book-item">
@@ -51,20 +51,32 @@ export default {
     const firestore = getFirestore();
 
     if (auth.currentUser) {
-      const userRef = doc(firestore, 'favorites', auth.currentUser.uid);
-      const docSnap = await getDoc(userRef);
+      try {
+        const userRef = doc(firestore, 'favorites', auth.currentUser.uid);
+        const docSnap = await getDoc(userRef);
 
-      if (docSnap.exists()) {
-        const bookIds = docSnap.data().books || [];
-        this.favoriteBooks = this.allBooks.filter(book => bookIds.includes(book.id));
+        if (docSnap.exists()) {
+          const bookIds = docSnap.data().books || [];
+          // Filtriramo samo lajkovane knjige
+          this.favoriteBooks = this.allBooks.filter(book => bookIds.includes(book.id));
+        } else {
+          console.log('Dokument nije pronađen za ovog korisnika.');
+        }
+      } catch (error) {
+        console.error("Greška prilikom dohvaćanja omiljenih knjiga:", error);
       }
     } else {
-      console.error('User is not logged in');
+      console.error('Korisnik nije ulogovan.');
     }
   },
   methods: {
     getImagePath(image) {
-      return require(`@/assets/${image}`);
+      try {
+        return require(`@/assets/${image}`);
+      } catch (error) {
+        console.error(`Greška prilikom učitavanja slike: ${image}`, error);
+        return '';
+      }
     }
   }
 };
