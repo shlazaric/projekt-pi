@@ -57,7 +57,7 @@ export default {
 
         if (docSnap.exists()) {
           const bookIds = docSnap.data().books || [];
-          // Filtriramo samo lajkovane knjige
+         
           this.favoriteBooks = this.allBooks.filter(book => bookIds.includes(book.id));
         } else {
           console.log('Dokument nije pronađen za ovog korisnika.');
@@ -66,7 +66,7 @@ export default {
         console.error("Greška prilikom dohvaćanja omiljenih knjiga:", error);
       }
     } else {
-      console.error('Korisnik nije ulogovan.');
+      console.error('Korisnik nije ulogiran.');
     }
   },
   methods: {
