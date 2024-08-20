@@ -13,7 +13,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
@@ -21,7 +20,10 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore';
 export default {
   data() {
     return {
+      // Omiljene knjige korisnika
       favoriteBooks: [],
+      
+      // Svi dostupni naslovi knjiga
       allBooks: [
         { id: 1, name: 'Nestrpljiva čizmica', image: 'cizmica.jpg' },
         { id: 2, name: 'Gregorov dnevnik', image: 'dnevnik.jpg' },
@@ -46,18 +48,22 @@ export default {
       ]
     };
   },
+  
   async created() {
-    const auth = getAuth();
-    const firestore = getFirestore();
+    const auth = getAuth();  // Dohvaćanje Firebase autentifikacije
+    const firestore = getFirestore();  // Dohvaćanje Firebase Firestore instance
 
     if (auth.currentUser) {
       try {
+        // Dohvaćanje referenca na dokument korisnika u kolekciji 'favorites'
         const userRef = doc(firestore, 'favorites', auth.currentUser.uid);
         const docSnap = await getDoc(userRef);
 
         if (docSnap.exists()) {
+          // Dohvaćanje popisa ID-ova omiljenih knjiga
           const bookIds = docSnap.data().books || [];
-         
+          
+          // Filtriranje knjiga koje su omiljene na temelju ID-ova
           this.favoriteBooks = this.allBooks.filter(book => bookIds.includes(book.id));
         } else {
           console.log('Dokument nije pronađen za ovog korisnika.');
@@ -69,7 +75,9 @@ export default {
       console.error('Korisnik nije ulogiran.');
     }
   },
+  
   methods: {
+    // Metoda za dohvaćanje slike knjige iz lokalnog direktorija
     getImagePath(image) {
       try {
         return require(`@/assets/${image}`);
@@ -81,6 +89,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .favorites {

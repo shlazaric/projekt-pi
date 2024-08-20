@@ -34,14 +34,14 @@
 </template>
 
 <script>
-import { getAuth } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { db } from '@/firebase'; // Importirajte db iz firebase.js
+import { getAuth } from 'firebase/auth'; 
+import { doc, setDoc, getDoc } from 'firebase/firestore'; 
+import { db } from '@/firebase'; 
 
 export default {
   data() {
     return {
-      searchQuery: '',
+      searchQuery: '', // Sprema unos korisnika za pretragu po ID-u
       books: [
         { id: 1, name: 'Nestrpljiva čizmica', image: 'cizmica.jpg', liked: false },
         { id: 2, name: 'Gregorov dnevnik', image: 'dnevnik.jpg', liked: false },
@@ -64,63 +64,68 @@ export default {
         { id: 19, name: 'Priča o plavom planetu', image: 'plaviplanet.jpg', liked: false },
         { id: 20, name: 'Soba puna snova', image: 'soba.jpg', liked: false }
       ],
-      selectedBook: null,
-      showNotFoundMessage: false,
-      reviewText: '',
-      userId: null
+      selectedBook: null, // Sprema odabranu knjigu nakon pretrage
+      showNotFoundMessage: false, // Prikazuje poruku ako knjiga nije pronađena
+      reviewText: '', // Sprema tekst recenzije
+      userId: null // Sprema ID ulogiranog korisnika
     };
   },
   methods: {
+   
     async searchById() {
-      const queryId = parseInt(this.searchQuery);
-      this.selectedBook = this.books.find(book => book.id === queryId) || null;
-      this.showNotFoundMessage = !this.selectedBook;
-      this.reviewText = ''; 
+      const queryId = parseInt(this.searchQuery); // Pretvara unos u broj
+      this.selectedBook = this.books.find(book => book.id === queryId) || null; // Pronalazi knjigu po ID-u
+      this.showNotFoundMessage = !this.selectedBook; // Prikazuje poruku ako knjiga nije pronađena
+      this.reviewText = ''; // Resetira tekst recenzije
     },
+    // Funkcija za dohvat slike knjige
     getImagePath(image) {
       return require(`@/assets/${image}`);
     },
+    // Funkcija za slanje recenzije
     async submitReview() {
-      if (this.reviewText.trim()) {
+      if (this.reviewText.trim()) { // Provjerava da li je recenzija unesena
         alert(`Recenzija za knjigu "${this.selectedBook.name}":\n\n${this.reviewText}`);
-        this.reviewText = ''; 
+        this.reviewText = ''; // Resetira tekst recenzije nakon slanja
       } else {
         alert('Molimo unesite tekst recenzije.');
       }
     },
+    // Funkcija za dodavanje/uklanjanje knjige iz favorita
     async toggleLike() {
       if (this.selectedBook) {
         const book = this.selectedBook;
-        book.liked = !book.liked;
+        book.liked = !book.liked; // Mijenja status 'liked' za odabranu knjigu
         this.selectedBook = { ...book };
 
-        const user = getAuth().currentUser;
+        const user = getAuth().currentUser; // Dohvaća ulogiranog korisnika
         if (user) {
-          this.userId = user.uid;
-          const favoritesRef = doc(db, 'favorites', this.userId);
-          const docSnap = await getDoc(favoritesRef);
+          this.userId = user.uid; // Sprema ID korisnika
+          const favoritesRef = doc(db, 'favorites', this.userId); // Referenca na dokument u Firestore-u za favorite korisnika
+          const docSnap = await getDoc(favoritesRef); // Dohvaća dokument
 
           let favoriteBooks = [];
           if (docSnap.exists()) {
-            favoriteBooks = docSnap.data().books || [];
+            favoriteBooks = docSnap.data().books || []; // Dohvaća listu omiljenih knjiga iz dokumenta
           }
 
           if (book.liked) {
             if (!favoriteBooks.includes(book.id)) {
-              favoriteBooks.push(book.id);
+              favoriteBooks.push(book.id); // Dodaje knjigu u favorite ako nije već u listi
             }
           } else {
-            favoriteBooks = favoriteBooks.filter(id => id !== book.id);
+            favoriteBooks = favoriteBooks.filter(id => id !== book.id); // Uklanja knjigu iz liste favorita
           }
 
-          await setDoc(favoritesRef, { books: favoriteBooks });
+          await setDoc(favoritesRef, { books: favoriteBooks }); // Ažurira dokument u Firestore-u
         } else {
-          console.error('User is not authenticated');
+          console.error('User is not authenticated'); // Prikazuje grešku ako korisnik nije prijavljen
         }
       }
     }
   },
   computed: {
+    // Proračunava da li je odabrana knjiga u favoritima
     isLiked() {
       return this.selectedBook && this.selectedBook.liked;
     }
