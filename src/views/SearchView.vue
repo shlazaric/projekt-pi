@@ -1,133 +1,92 @@
 <template>
   <div class="search-view">
-    <div class="welcome-message">
-      <p>Dobrodošao/la!</p>
-    </div>
-
-    <nav class="navigation">
-      <router-link to="/favorites" class="nav-link">Favoriti</router-link>
-    </nav>
-
-    <input v-model="searchQuery" placeholder="Unesite ID knjige">
-    <button @click="searchById">Pretraži po ID-u</button>
+    <h2>Dobrodošao/la !</h2>
+    <input v-model="searchQuery" placeholder="Unesite naziv knjige" />
+    <button @click="searchByName">Pretraži</button>
 
     <div v-if="selectedBook" class="book-item">
-      <img :src="getImagePath(selectedBook.image)" :alt="selectedBook.name">
+      <img :src="getImagePath(selectedBook.image)" :alt="selectedBook.name" />
       <p>{{ selectedBook.name }}</p>
 
       <div class="like-button" @click="toggleLike">
         <span v-if="isLiked">❤️</span>
         <span v-else>🤍</span>
       </div>
-
-      <div class="review-section">
-        <h3>Napiši recenziju:</h3>
-        <textarea v-model="reviewText" placeholder="Unesite svoju recenziju ovdje..."></textarea>
-        <button @click="submitReview">Pošalji recenziju</button>
-      </div>
+      <button @click="submitLike">Označi sa "sviđa mi se" </button>
     </div>
 
-    <div v-if="showNotFoundMessage" class="no-book-message">
-      <p>Nije pronađena knjiga sa ID-om {{ searchQuery }}.</p>
+    <div v-if="showNotFoundMessage">
+      <p>Knjiga sa nazivom "{{ searchQuery }}" nije pronađena.</p>
     </div>
   </div>
 </template>
 
 <script>
-import { getAuth } from 'firebase/auth'; 
-import { doc, setDoc, getDoc } from 'firebase/firestore'; 
-import { db } from '@/firebase'; 
-
 export default {
   data() {
     return {
-      searchQuery: '', // Sprema unos korisnika za pretragu po ID-u
+      searchQuery: '',
+      selectedBook: null,
+      showNotFoundMessage: false,
+      likedBooks: [],
       books: [
-        { id: 1, name: 'Nestrpljiva čizmica', image: 'cizmica.jpg', liked: false },
-        { id: 2, name: 'Gregorov dnevnik', image: 'dnevnik.jpg', liked: false },
-        { id: 3, name: 'Empatija slušanje srcem', image: 'empatija.jpg', liked: false },
-        { id: 4, name: 'Mali princ', image: 'princ.jpg', liked: false },
-        { id: 5, name: 'Zaljubljen do ušiju', image: 'zaljubljen.jpg', liked: false },
-        { id: 6, name: 'Besmrtnost', image: 'besmrtnost.jpg', liked: false },
-        { id: 7, name: 'Igre nasljedstva', image: 'igre.jpg', liked: false },
-        { id: 8, name: 'Bog podzemlja', image: 'podzemlje.jpg', liked: false },
-        { id: 9, name: 'Bonton za djecu i mlade', image: 'bonton.jpg', liked: false },
-        { id: 10, name: 'U potrazi za Alaskom', image: 'alaska.jpg', liked: false },
-        { id: 11, name: 'Bajkarenje', image: 'bajkarenje.jpg', liked: false },
-        { id: 12, name: 'Harry Potter i kamen mudraca', image: 'harry.jpg', liked: false },
-        { id: 13, name: 'Kako bolje misliti', image: 'kako.jpg', liked: false },
-        { id: 14, name: 'Kako manje misliti', image: 'kakomanje.jpg', liked: false },
-        { id: 15, name: 'Kako izbjeći manipulatore', image: 'manipulatori.jpg', liked: false },
-        { id: 16, name: 'Knjižnica tajni', image: 'knjiznica.jpg', liked: false },
-        { id: 17, name: 'Priča bez kraja', image: 'prica.jpg', liked: false },
-        { id: 18, name: 'Slučajni cimeri', image: 'cimeeri.jpg', liked: false },
-        { id: 19, name: 'Priča o plavom planetu', image: 'plaviplanet.jpg', liked: false },
-        { id: 20, name: 'Soba puna snova', image: 'soba.jpg', liked: false }
+        { id: 1, name: 'Nestrpljiva čizmica', image: 'cizmica.jpg' },
+        { id: 2, name: 'Gregorov dnevnik', image: 'dnevnik.jpg' },
+        { id: 3, name: 'Empatija slušanje srcem', image: 'empatija.jpg' },
+        { id: 4, name: 'Mali princ', image: 'princ.jpg' },
+        { id: 5, name: 'Zaljubljen do ušiju', image: 'zaljubljen.jpg' },
+        { id: 6, name: 'Besmrtnost', image: 'besmrtnost.jpg' },
+        { id: 7, name: 'Igre nasljedstva', image: 'igre.jpg' },
+        { id: 8, name: 'Bog podzemlja', image: 'podzemlje.jpg' },
+        { id: 9, name: 'Bonton za djecu i mlade', image: 'bonton.jpg' },
+        { id: 10, name: 'U potrazi za Alaskom', image: 'alaska.jpg' },
+        { id: 11, name: 'Bajkarenje', image: 'bajkarenje.jpg' },
+        { id: 12, name: 'Harry Potter i kamen mudraca', image: 'harry.jpg' },
+        { id: 13, name: 'Kako bolje misliti', image: 'kako.jpg' },
+        { id: 14, name: 'Kako manje misliti', image: 'kakomanje.jpg' },
+        { id: 15, name: 'Kako izbjeći manipulatore', image: 'manipulatori.jpg' },
+        { id: 16, name: 'Knjižnica tajni', image: 'knjiznica.jpg' },
+        { id: 17, name: 'Priča bez kraja', image: 'prica.jpg' },
+        { id: 18, name: 'Slučajni cimeri', image: 'cimeeri.jpg' },
+        { id: 19, name: 'Priča o plavom planetu', image: 'plaviplanet.jpg' },
+        { id: 20, name: 'Soba puna snova', image: 'soba.jpg' }
       ],
-      selectedBook: null, // Sprema odabranu knjigu nakon pretrage
-      showNotFoundMessage: false, // Prikazuje poruku ako knjiga nije pronađena
-      reviewText: '', // Sprema tekst recenzije
-      userId: null // Sprema ID ulogiranog korisnika
     };
-  },
-  methods: {
-   
-    async searchById() {
-      const queryId = parseInt(this.searchQuery); // Pretvara unos u broj
-      this.selectedBook = this.books.find(book => book.id === queryId) || null; // Pronalazi knjigu po ID-u
-      this.showNotFoundMessage = !this.selectedBook; // Prikazuje poruku ako knjiga nije pronađena
-      this.reviewText = ''; // Resetira tekst recenzije
-    },
-    // Funkcija za dohvat slike knjige
-    getImagePath(image) {
-      return require(`@/assets/${image}`);
-    },
-    // Funkcija za slanje recenzije
-    async submitReview() {
-      if (this.reviewText.trim()) { // Provjerava da li je recenzija unesena
-        alert(`Recenzija za knjigu "${this.selectedBook.name}":\n\n${this.reviewText}`);
-        this.reviewText = ''; // Resetira tekst recenzije nakon slanja
-      } else {
-        alert('Molimo unesite tekst recenzije.');
-      }
-    },
-    // Funkcija za dodavanje/uklanjanje knjige iz favorita
-    async toggleLike() {
-      if (this.selectedBook) {
-        const book = this.selectedBook;
-        book.liked = !book.liked; // Mijenja status 'liked' za odabranu knjigu
-        this.selectedBook = { ...book };
-
-        const user = getAuth().currentUser; // Dohvaća ulogiranog korisnika
-        if (user) {
-          this.userId = user.uid; // Sprema ID korisnika
-          const favoritesRef = doc(db, 'favorites', this.userId); // Referenca na dokument u Firestore-u za favorite korisnika
-          const docSnap = await getDoc(favoritesRef); // Dohvaća dokument
-
-          let favoriteBooks = [];
-          if (docSnap.exists()) {
-            favoriteBooks = docSnap.data().books || []; // Dohvaća listu omiljenih knjiga iz dokumenta
-          }
-
-          if (book.liked) {
-            if (!favoriteBooks.includes(book.id)) {
-              favoriteBooks.push(book.id); // Dodaje knjigu u favorite ako nije već u listi
-            }
-          } else {
-            favoriteBooks = favoriteBooks.filter(id => id !== book.id); // Uklanja knjigu iz liste favorita
-          }
-
-          await setDoc(favoritesRef, { books: favoriteBooks }); // Ažurira dokument u Firestore-u
-        } else {
-          console.error('User is not authenticated'); // Prikazuje grešku ako korisnik nije prijavljen
-        }
-      }
+  },computed: {
+    isLiked() {
+      return this.selectedBook && this.likedBooks.some(book => book.id === this.selectedBook.id);
     }
   },
-  computed: {
-    // Proračunava da li je odabrana knjiga u favoritima
-    isLiked() {
-      return this.selectedBook && this.selectedBook.liked;
+  mounted() {
+    const savedBooks = JSON.parse(localStorage.getItem('likedBooks'));
+    if (savedBooks) {
+      this.likedBooks = savedBooks;
+    }
+  },
+  methods: {
+    searchByName() {
+      const queryName = this.searchQuery.toLowerCase().trim();
+      this.selectedBook = this.books.find(book => book.name.toLowerCase() === queryName) || null;
+      this.showNotFoundMessage = !this.selectedBook;
+    },
+    toggleLike() {
+      if (this.selectedBook) {
+        const index = this.likedBooks.findIndex(book => book.id === this.selectedBook.id);
+        if (index === -1) {
+          this.likedBooks.push(this.selectedBook);
+        } else {
+          this.likedBooks.splice(index, 1);
+        }
+        localStorage.setItem('likedBooks', JSON.stringify(this.likedBooks));
+      }
+    },
+    submitLike() {
+      if (this.selectedBook && !this.isLiked) {
+        this.toggleLike();
+      }
+    },
+    getImagePath(image) {
+      return require(`@/assets/${image}`);
     }
   }
 };
@@ -135,40 +94,40 @@ export default {
 
 <style scoped>
 .search-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
   background-image: url('@/assets/naslovna.jpg');
   background-size: cover;
   background-position: center;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  min-height: 100vh;
   color: white;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  text-align: center;
-}
-
-.welcome-message {
-  margin-bottom: 10px;
 }
 
 input {
   margin-bottom: 10px;
-  padding: 5px;
-  width: 200px;
+  padding: 8px;
+  width: 300px;
 }
 
 button {
+  padding: 8px 16px;
   margin-bottom: 20px;
+  cursor: pointer;
 }
 
 .book-item {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .book-item img {
-  width: 100px;
-  height: 100px;
+  width: 150px;
+  height: 200px;
 }
 
 .like-button {
@@ -177,30 +136,7 @@ button {
   margin-top: 10px;
 }
 
-.review-section {
-  margin-top: 20px;
-  text-align: center;
-}
-
-textarea {
-  width: 80%;
-  height: 100px;
-  margin-bottom: 10px;
-}
-
-.no-book-message {
-  margin-top: 10px;
-  color: red;
-}
-
-.navigation {
-  margin-bottom: 20px;
-}
-
-.nav-link {
-  color: #42b983;
-  text-decoration: none;
-  font-size: 1.2rem;
-  margin-right: 15px;
+.like-button span {
+  font-size: 2rem;
 }
 </style>

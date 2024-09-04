@@ -1,138 +1,102 @@
 <template>
-  <div class="favorites">
-    <router-link to="/search-view" class="back-link">Povratak na pretraživanje</router-link>
-    <h2>Omiljene knjige</h2>
-    <div v-if="favoriteBooks.length">
-      <div v-for="book in favoriteBooks" :key="book.id" class="book-item">
-        <img :src="getImagePath(book.image)" :alt="book.name">
-        <p>{{ book.name }}</p>
-      </div>
+  <div class="favorites-view">
+    <h1>Omiljene Knjige</h1>
+    <button @click="goBack">Povratak na pretragu</button>
+    
+    <div v-if="favorites.length === 0">
+      <p>Nema omiljenih knjiga.</p>
     </div>
-    <div v-else>
-      <p>Nemate omiljenih knjiga.</p>
+    
+    <div v-for="book in favorites" :key="book.id" class="book-item">
+      <img :src="getImagePath(book.image)" :alt="book.name" />
+      <p>{{ book.name }}</p>
+      <input v-model="reviews[book.id]" placeholder="Napišite recenziju" />
+      <button @click="submitReview(book)">Pošalji recenziju</button>
     </div>
   </div>
 </template>
+
 <script>
-import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { db } from '@/firebase';
+import { collection, addDoc } from 'firebase/firestore';
 
 export default {
   data() {
     return {
-      // Omiljene knjige korisnika
-      favoriteBooks: [],
-      
-      // Svi dostupni naslovi knjiga
-      allBooks: [
-        { id: 1, name: 'Nestrpljiva čizmica', image: 'cizmica.jpg' },
-        { id: 2, name: 'Gregorov dnevnik', image: 'dnevnik.jpg' },
-        { id: 3, name: 'Empatija slušanje srcem', image: 'empatija.jpg' },
-        { id: 4, name: 'Mali princ', image: 'princ.jpg' },
-        { id: 5, name: 'Zaljubljen do ušiju', image: 'zaljubljen.jpg' },
-        { id: 6, name: 'Besmrtnost', image: 'besmrtnost.jpg' },
-        { id: 7, name: 'Igre nasljedstva', image: 'igre.jpg' },
-        { id: 8, name: 'Bog podzemlja', image: 'podzemlje.jpg' },
-        { id: 9, name: 'Bonton za djecu i mlade', image: 'bonton.jpg' },
-        { id: 10, name: 'U potrazi za Alaskom', image: 'alaska.jpg' },
-        { id: 11, name: 'Bajkarenje', image: 'bajkarenje.jpg' },
-        { id: 12, name: 'Harry Potter i kamen mudraca', image: 'harry.jpg' },
-        { id: 13, name: 'Kako bolje misliti', image: 'kako.jpg' },
-        { id: 14, name: 'Kako manje misliti', image: 'kakomanje.jpg' },
-        { id: 15, name: 'Kako izbjeći manipulatore', image: 'manipulatori.jpg' },
-        { id: 16, name: 'Knjižnica tajni', image: 'knjiznica.jpg' },
-        { id: 17, name: 'Priča bez kraja', image: 'prica.jpg' },
-        { id: 18, name: 'Slučajni cimeri', image: 'cimeeri.jpg' },
-        { id: 19, name: 'Priča o plavom planetu', image: 'plaviplanet.jpg' },
-        { id: 20, name: 'Soba puna snova', image: 'soba.jpg' }
-      ]
+      favorites: [],
+      reviews: {},
     };
   },
-  
-  async created() {
-    const auth = getAuth();  // Dohvaćanje Firebase autentifikacije
-    const firestore = getFirestore();  // Dohvaćanje Firebase Firestore instance
-
-    if (auth.currentUser) {
-      try {
-        // Dohvaćanje referenca na dokument korisnika u kolekciji 'favorites'
-        const userRef = doc(firestore, 'favorites', auth.currentUser.uid);
-        const docSnap = await getDoc(userRef);
-
-        if (docSnap.exists()) {
-          // Dohvaćanje popisa ID-ova omiljenih knjiga
-          const bookIds = docSnap.data().books || [];
-          
-          // Filtriranje knjiga koje su omiljene na temelju ID-ova
-          this.favoriteBooks = this.allBooks.filter(book => bookIds.includes(book.id));
-        } else {
-          console.log('Dokument nije pronađen za ovog korisnika.');
-        }
-      } catch (error) {
-        console.error("Greška prilikom dohvaćanja omiljenih knjiga:", error);
-      }
-    } else {
-      console.error('Korisnik nije ulogiran.');
+  mounted() {
+    const savedBooks = JSON.parse(localStorage.getItem('likedBooks'));
+    if (savedBooks) {
+      this.favorites = savedBooks;
     }
   },
-  
   methods: {
-    // Metoda za dohvaćanje slike knjige iz lokalnog direktorija
     getImagePath(image) {
-      try {
-        return require(`@/assets/${image}`);
-      } catch (error) {
-        console.error(`Greška prilikom učitavanja slike: ${image}`, error);
-        return '';
+      return require(`@/assets/${image}`);
+    },
+    goBack() {
+      this.$router.push('/search-view');
+    },
+    async submitReview(book) {
+      const review = this.reviews[book.id] || '';
+      if (review) {
+        try {
+          await addDoc(collection(db, 'reviews'), {
+            bookId: book.id,
+            bookName: book.name,
+            review: review,
+          });
+          this.reviews[book.id] = '';
+          alert('Recenzija je poslana!');
+        } catch (error) {
+          console.error('Error adding review: ', error);
+        }
+      } else {
+        alert('Molimo unesite recenziju!');
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
-
 <style scoped>
-.favorites {
+.favorites-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
   background-image: url('@/assets/naslovna.jpg');
   background-size: cover;
   background-position: center;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  min-height: 100vh;
   color: white;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  text-align: center;
-  padding: 20px;
 }
 
 .book-item {
-  margin: 10px 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
+  margin: 20px 0;
 }
 
 .book-item img {
-  width: 50px;
-  height: 50px;
-  margin-right: 10px;
+  width: 150px;
+  height: 200px;
 }
 
-h2 {
-  font-size: 2rem;
-  margin-bottom: 20px;
+button {
+  padding: 8px 16px;
+  margin-top: 10px;
+  cursor: pointer;
 }
 
-.back-link {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  font-size: 1.2rem;
-  color: #42b983;
-  text-decoration: none;
-  background-color: rgba(255, 255, 255, 0.7);
-  padding: 5px 10px;
-  border-radius: 5px;
+input {
+  margin-top: 10px;
+  padding: 8px;
+  width: 300px;
 }
 </style>
