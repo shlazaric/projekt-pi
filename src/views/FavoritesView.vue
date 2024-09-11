@@ -1,6 +1,6 @@
 <template>
   <div class="favorites-view">
-    <h1>Omiljene Knjige</h1>
+    <h1>Omiljene knjige :</h1>
     <button @click="goBack">Povratak na pretragu</button>
     
     <div v-if="favorites.length === 0">
