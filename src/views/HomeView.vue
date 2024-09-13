@@ -12,16 +12,37 @@
         <p>Već jesi naš korisnik?</p>
         <router-link to="/login-view">Prijavi se</router-link>
       </div>
+
     </div>
   </div>
 </template>
 
 <script>
+import { auth } from '@/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+
 export default {
   name: 'HomeView',
- 
+  data() {
+    return {
+      isLoggedIn: false,
+    };
+  },
+  mounted() {
+    onAuthStateChanged(auth, (user) => {
+      this.isLoggedIn = !!user;
+    });
+  },
+  methods: {
+    checkAuthAndNavigate() {
+      if (this.isLoggedIn) {
+        this.$router.push('/favorites');
+      } else {
+        this.$router.push('/login-view');
+      }
+    },
+  },
 };
-
 </script>
 
 <style scoped>
@@ -39,7 +60,7 @@ export default {
 }
 
 .content {
-  background-color: rgba(0, 0, 0, 0.5); 
+  background-color: rgba(0, 0, 0, 0.5);
   padding: 20px;
   border-radius: 10px;
 }

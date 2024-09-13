@@ -5,8 +5,7 @@
       <form @submit.prevent="login">
         <div class="form-group">
           <label for="emailField">E-mail:</label>
-          <input v-model="email" type="email" class="form-control" id="emailField" aria-describedby="emailHelp" placeholder="Upiši e-mail" required>
-          <small id="emailHelp" class="form-text text-muted"></small>
+          <input v-model="email" type="email" class="form-control" id="emailField" placeholder="Upiši e-mail" required>
         </div>
         <div class="form-group">
           <label for="passwordField">Lozinka:</label>
@@ -19,7 +18,6 @@
 </template>
 
 <script>
-
 import { auth } from '@/firebase'; 
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
@@ -34,14 +32,12 @@ export default {
   methods: {
     async login() {
       try {
-        
         const userCredential = await signInWithEmailAndPassword(auth, this.email, this.password);
-        console.log('User logged in:', userCredential.user);
-
+        console.log('Korisnik prijavljen:', userCredential.user);
         
-        this.$router.push('/search-view');
+        this.$router.push('/search-view'); // Preusmjeri na search-view nakon uspješne prijave
       } catch (error) {
-        console.error('Error during login:', error);
+        console.error('Greška tijekom prijave:', error);
         alert("Pogrešan e-mail ili lozinka!");
       }
     }

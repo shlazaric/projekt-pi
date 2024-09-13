@@ -1,39 +1,58 @@
 <template>
   <div class="favorites-view">
     <h1>Omiljene knjige :</h1>
-    <button @click="goBack">Povratak na pretragu</button>
     
-    <div v-if="favorites.length === 0">
-      <p>Nema omiljenih knjiga.</p>
+    <div v-if="userId">
+      <button @click="goBack">Povratak na pretragu</button>
+      
+      <div v-if="favorites.length === 0">
+        <p>Nema omiljenih knjiga.</p>
+      </div>
+      
+      <div v-for="book in favorites" :key="book.id" class="book-item">
+        <img :src="getImagePath(book.image)" :alt="book.name" />
+        <p>{{ book.name }}</p>
+        <input v-model="reviews[book.id]" placeholder="Napišite recenziju" />
+        <button @click="submitReview(book)">Pošalji recenziju</button>
+      </div>
     </div>
     
-    <div v-for="book in favorites" :key="book.id" class="book-item">
-      <img :src="getImagePath(book.image)" :alt="book.name" />
-      <p>{{ book.name }}</p>
-      <input v-model="reviews[book.id]" placeholder="Napišite recenziju" />
-      <button @click="submitReview(book)">Pošalji recenziju</button>
+    <div v-else>
+      <p>Molimo prijavite se kako biste vidjeli omiljene knjige.</p>
     </div>
   </div>
 </template>
 
 <script>
-import { db } from '@/firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { db, auth } from '@/firebase';
+import { collection, doc, getDocs, setDoc, query, where } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default {
   data() {
     return {
       favorites: [],
       reviews: {},
+      userId: null,
     };
   },
   mounted() {
-    const savedBooks = JSON.parse(localStorage.getItem('likedBooks'));
-    if (savedBooks) {
-      this.favorites = savedBooks;
-    }
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.userId = user.uid;
+        this.loadFavorites();
+      } else {
+        this.userId = null;
+        this.$router.push('/login');
+      }
+    });
   },
   methods: {
+    async loadFavorites() {
+      const q = query(collection(db, 'favorites'), where('userId', '==', this.userId));
+      const querySnapshot = await getDocs(q);
+      this.favorites = querySnapshot.docs.map(doc => doc.data().book);
+    },
     getImagePath(image) {
       return require(`@/assets/${image}`);
     },
@@ -44,7 +63,8 @@ export default {
       const review = this.reviews[book.id] || '';
       if (review) {
         try {
-          await addDoc(collection(db, 'reviews'), {
+          await setDoc(doc(db, 'reviews', `${this.userId}_${book.id}`), {
+            userId: this.userId,
             bookId: book.id,
             bookName: book.name,
             review: review,
@@ -52,7 +72,7 @@ export default {
           this.reviews[book.id] = '';
           alert('Recenzija je poslana!');
         } catch (error) {
-          console.error('Error adding review: ', error);
+          console.error('Greška prilikom dodavanja recenzije: ', error);
         }
       } else {
         alert('Molimo unesite recenziju!');

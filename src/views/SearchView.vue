@@ -1,8 +1,9 @@
 <template>
   <div class="search-view">
-    <h2>Dobrodošao/la !</h2>
+    <h2>Dobrodošao/la!</h2>
     <input v-model="searchQuery" placeholder="Unesite naziv knjige" />
     <button @click="searchByName">Pretraži</button>
+    <router-link to="/favorites" class="favorites-link">Pogledaj omiljene knjige</router-link>
 
     <div v-if="selectedBook" class="book-item">
       <img :src="getImagePath(selectedBook.image)" :alt="selectedBook.name" />
@@ -12,7 +13,7 @@
         <span v-if="isLiked">❤️</span>
         <span v-else>🤍</span>
       </div>
-      <button @click="submitLike">Označi sa "sviđa mi se" </button>
+      <button @click="submitLike">Označi sa "sviđa mi se"</button>
     </div>
 
     <div v-if="showNotFoundMessage">
@@ -22,6 +23,10 @@
 </template>
 
 <script>
+import { db, auth } from '@/firebase';
+import { collection, query, where, getDocs, setDoc, doc, deleteDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+
 export default {
   data() {
     return {
@@ -47,21 +52,28 @@ export default {
         { id: 15, name: 'Kako izbjeći manipulatore', image: 'manipulatori.jpg' },
         { id: 16, name: 'Knjižnica tajni', image: 'knjiznica.jpg' },
         { id: 17, name: 'Priča bez kraja', image: 'prica.jpg' },
-        { id: 18, name: 'Slučajni cimeri', image: 'cimeeri.jpg' },
+        { id: 18, name: 'Slučajni cimeri', image: 'cimeri.jpg' },
         { id: 19, name: 'Priča o plavom planetu', image: 'plaviplanet.jpg' },
         { id: 20, name: 'Soba puna snova', image: 'soba.jpg' }
       ],
+      userId: null,
     };
-  },computed: {
+  },
+  computed: {
     isLiked() {
       return this.selectedBook && this.likedBooks.some(book => book.id === this.selectedBook.id);
     }
   },
   mounted() {
-    const savedBooks = JSON.parse(localStorage.getItem('likedBooks'));
-    if (savedBooks) {
-      this.likedBooks = savedBooks;
-    }
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.userId = user.uid;
+        this.loadLikedBooks();
+      } else {
+        alert('Molimo prijavite se kako biste koristili ovu funkciju.');
+        this.$router.push('/login');
+      }
+    });
   },
   methods: {
     searchByName() {
@@ -69,15 +81,24 @@ export default {
       this.selectedBook = this.books.find(book => book.name.toLowerCase() === queryName) || null;
       this.showNotFoundMessage = !this.selectedBook;
     },
-    toggleLike() {
+    async loadLikedBooks() {
+      const q = query(collection(db, 'favorites'), where('userId', '==', this.userId));
+      const querySnapshot = await getDocs(q);
+      this.likedBooks = querySnapshot.docs.map(doc => doc.data().book);
+    },
+    async toggleLike() {
       if (this.selectedBook) {
         const index = this.likedBooks.findIndex(book => book.id === this.selectedBook.id);
         if (index === -1) {
+          await setDoc(doc(db, 'favorites', `${this.userId}_${this.selectedBook.id}`), {
+            userId: this.userId,
+            book: this.selectedBook,
+          });
           this.likedBooks.push(this.selectedBook);
         } else {
+          await deleteDoc(doc(db, 'favorites', `${this.userId}_${this.selectedBook.id}`));
           this.likedBooks.splice(index, 1);
         }
-        localStorage.setItem('likedBooks', JSON.stringify(this.likedBooks));
       }
     },
     submitLike() {
@@ -136,7 +157,9 @@ button {
   margin-top: 10px;
 }
 
-.like-button span {
-  font-size: 2rem;
+.favorites-link {
+  margin-top: 20px;
+  color: white;
+  text-decoration: underline;
 }
 </style>
