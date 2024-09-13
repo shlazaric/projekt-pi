@@ -3,7 +3,6 @@
     <h2>Dobrodošao/la!</h2>
     <input v-model="searchQuery" placeholder="Unesite naziv knjige" />
     <button @click="searchByName">Pretraži</button>
-    <router-link to="/favorites" class="favorites-link">Pogledaj omiljene knjige</router-link>
 
     <div v-if="selectedBook" class="book-item">
       <img :src="getImagePath(selectedBook.image)" :alt="selectedBook.name" />
@@ -71,7 +70,7 @@ export default {
         this.loadLikedBooks();
       } else {
         alert('Molimo prijavite se kako biste koristili ovu funkciju.');
-        this.$router.push('/login');
+        this.$router.push('/login-view');
       }
     });
   },
@@ -157,9 +156,7 @@ button {
   margin-top: 10px;
 }
 
-.favorites-link {
-  margin-top: 20px;
-  color: white;
-  text-decoration: underline;
+.like-button span {
+  font-size: 2rem;
 }
 </style>
