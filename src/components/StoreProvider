@@ -1,0 +1,31 @@
+
+<template>
+    <slot></slot>
+    </template>
+
+    <script>
+import { reactive, provide } from 'vue';
+
+export default {
+    setup() {
+        const state = reactive({
+            likedBooks: []
+        });
+
+        function toggleLike(book) {
+            const likedBook = state.likedBooks.find(b => b.id === book.id);
+            if (likedBook) {
+
+                state.likedBooks = state.likedBooks.filter(b => b.id !== book.id);
+            } else {
+
+                state.likedBooks.push(book);
+            }
+        }
+
+
+        provide('state', state);
+        provide('toggleLike', toggleLike);
+    }
+};
+</script>

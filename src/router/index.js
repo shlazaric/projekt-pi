@@ -25,6 +25,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "searchview" */ '../views/SearchView.vue')
   },
   {
+    path: '/book-list',
+    name: 'PopisKnjiga',
+    component: () => import('@/views/PopisKnjiga.vue')
+  },
+  {
     path: '/favorites',
     name: 'favorites',
     component: FavoritesView,
