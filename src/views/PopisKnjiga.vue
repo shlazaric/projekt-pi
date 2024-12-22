@@ -3,13 +3,16 @@
     <h1>Popis Knjiga</h1>
     <ul>
       <li v-for="book in books" :key="book.id" class="book-item">
-        <div>
+        <div class="book-info">
           <img :src="require(`@/assets/${book.image}`)" :alt="book.name" class="book-image" />
-          <h2>{{ book.name }}</h2>
-          <p>{{ book.description }}</p>
+          <div class="book-details">
+            <h2>{{ book.name }}</h2>
+            <p>{{ book.description }}</p>
+          </div>
         </div>
+        
         <!-- Prikaz recenzija -->
-        <div>
+        <div class="reviews-section">
           <h3>Recenzije:</h3>
           <ul>
             <li v-for="review in book.reviews" :key="review.id">
@@ -70,6 +73,7 @@ export default {
   }
 };
 </script>
+
 <style scoped>
 .main-container {
   background-image: url('@/assets/naslovna.jpg');
@@ -78,21 +82,37 @@ export default {
   background-attachment: fixed; 
   color: white;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  padding: 20px;
 }
 
-.book-image {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.book-item {
+  margin-bottom: 20px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 15px;
+  border-radius: 8px;
 }
 
 .book-info {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+}
+
+.book-image {
+  width: 80px;
+  height: 120px;
+  object-fit: cover;
+  margin-right: 15px;
 }
 
 .book-details {
-  margin-left: 20px;
+  flex: 1;
 }
 
 .reviews-section {
@@ -103,9 +123,57 @@ textarea {
   width: 100%;
   height: 80px;
   margin-top: 10px;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
 button {
+  width: 100%;
+  padding: 10px;
   margin-top: 10px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+/* Responsivni dizajn za mobilne uređaje */
+@media (max-width: 600px) {
+  .main-container {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .book-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .book-image {
+    width: 60px;
+    height: 90px;
+  }
+
+  .book-details {
+    margin-left: 0;
+  }
+
+  textarea {
+    height: 100px;
+  }
+
+  button {
+    width: 100%;
+    font-size: 1rem;
+  }
 }
 </style>
